@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function Hero({ navigateTo }) {
+export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-4 pt-16 pb-24 overflow-hidden border-b border-[#FF7AB6]/10">
       
-      {/* Background Ambience & Perspective Grid lines in Sunset Pastel Tones */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div 
           className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF7AB6]/10 blur-[130px] rounded-full" 
@@ -15,7 +17,6 @@ export default function Hero({ navigateTo }) {
           style={{ width: '300px', height: '300px' }}
         />
         
-        {/* Custom Grid */}
         <div 
           className="absolute bottom-0 left-0 right-0 opacity-20"
           style={{
@@ -48,8 +49,8 @@ export default function Hero({ navigateTo }) {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
           <button 
-            onClick={() => navigateTo('register')}
-            className="w-full sm:w-auto bg-[#FFD166] hover:bg-[#FFB86B] text-[#1B1026] font-bold px-8 py-4 rounded-full text-base transition-colors shadow-lg shadow-[#FFD166]/10"
+            onClick={() => navigate('/register')}
+            className="w-full sm:w-auto bg-[#FFD166] hover:bg-[#FFB86B] text-[#1B1026] font-bold px-8 py-4 rounded-full text-base transition-colors shadow-lg shadow-[#FFD166]/10 outline-none"
           >
             Get Started
           </button>
@@ -58,7 +59,6 @@ export default function Hero({ navigateTo }) {
           </button>
         </div>
 
-        {/* Social Proof */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-8">
           <div className="flex -space-x-3">
             <img 

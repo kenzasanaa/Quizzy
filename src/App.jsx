@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import QuizzyLandingPage from './QuizzyLandingPage.jsx';
 import SignInPage from './form/SignInPage.jsx';
 import RegisterPage from './form/RegisterPage.jsx';
+import DashboardPage from './DashBord/DashboardPage.jsx';
+import CreateQuizPage from './DashBord/CreateQuizPage.jsx';
+import EventsPage from './Event/EventsPage'; 
+
+
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('landing'); // 'landing' | 'signin' | 'register'
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<QuizzyLandingPage />} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} /> 
+        <Route path="/events" element={<EventsPage />} /> 
+        <Route path="/create-quiz" element={<CreateQuizPage />} />       
 
-  const navigateTo = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
-  if (currentPage === 'signin') {
-    return <SignInPage navigateTo={navigateTo} />;
-  }
-  if (currentPage === 'register') {
-    return <RegisterPage navigateTo={navigateTo} />;
-  }
-
-  return <QuizzyLandingPage navigateTo={navigateTo} />;
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

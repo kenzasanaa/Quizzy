@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, GraduationCap, Presentation, ArrowLeft } from 'lucide-react';
 
-// Custom inline SVG Brand Icons to avoid Lucide-react v1+ trademark limitations
 const GoogleIcon = () => (
   <svg className="mr-2 h-4 w-4 shrink-0" viewBox="0 0 24 24">
     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.58c-.28 1.48-1.11 2.74-2.36 3.58v2.98h3.8c2.22-2.05 3.5-5.07 3.5-8.41z"/>
@@ -17,21 +17,17 @@ const FacebookIcon = () => (
   </svg>
 );
 
-export default function RegisterPage({ navigateTo }) {
-  const [role, setRole] = useState('student'); // 'student' | 'teacher'
+export default function RegisterPage() {
+  const [role, setRole] = useState('student');
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#1B1026] text-zinc-100 flex flex-col lg:flex-row font-sans">
       
-      {/* LEFT SIDE: Brand Identity with Sunset Pastel Perspective Grid */}
+      {/* LEFT SIDE */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#1B1026] relative flex-col items-center justify-center p-8 overflow-hidden border-r border-[#FF7AB6]/10">
-        
-        {/* Futuristic grid */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <div 
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF7AB6]/10 blur-[130px] rounded-full" 
-            style={{ width: '600px', height: '300px' }}
-          />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF7AB6]/10 blur-[130px] rounded-full" style={{ width: '600px', height: '300px' }} />
           <div 
             className="absolute bottom-0 left-0 right-0 opacity-20"
             style={{
@@ -47,37 +43,29 @@ export default function RegisterPage({ navigateTo }) {
           />
           <div className="absolute inset-0 bg-linear-to-t from-[#1B1026] via-transparent to-[#1B1026]" />
         </div>
-
-        <div className="relative z-10 text-center space-y-4">
+        <div className="relative z-10 text-center">
           <span className="text-6xl font-black tracking-widest bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] bg-clip-text text-transparent">
             Quizzy
           </span>
         </div>
       </div>
 
-      {/* RIGHT SIDE: Action Form Container */}
+      {/* RIGHT SIDE */}
       <div className="w-full lg:w-1/2 bg-white text-[#1B1026] flex flex-col justify-center p-6 sm:p-12 lg:p-16 relative">
-        
-        {/* Back navigation */}
         <button 
-          onClick={() => navigateTo('landing')}
-          className="absolute top-6 left-6 inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-[#FF7AB6] transition-colors"
+          onClick={() => navigate('/')}
+          className="absolute top-6 left-6 inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-[#FF7AB6] transition-colors outline-none"
         >
           <ArrowLeft size={16} /> Back to Home
         </button>
 
         <div className="max-w-md w-full mx-auto space-y-8 pt-8 lg:pt-0">
-          
-          {/* Form Header */}
           <div className="space-y-1">
             <h2 className="text-3xl font-black tracking-tight text-[#1B1026]">Create Account</h2>
             <p className="text-zinc-500 text-sm">Choose your account type and start your journey with us</p>
           </div>
 
-          {/* Account Role Selection */}
           <div className="grid grid-cols-2 gap-4">
-            
-            {/* Student Role Card */}
             <button 
               onClick={() => setRole('student')}
               className={`p-4 rounded-xl border text-left flex flex-col gap-2.5 transition-all outline-none ${
@@ -95,7 +83,6 @@ export default function RegisterPage({ navigateTo }) {
               </div>
             </button>
 
-            {/* Teacher Role Card */}
             <button 
               onClick={() => setRole('teacher')}
               className={`p-4 rounded-xl border text-left flex flex-col gap-2.5 transition-all outline-none ${
@@ -114,26 +101,21 @@ export default function RegisterPage({ navigateTo }) {
             </button>
           </div>
 
-          {/* Social Logins */}
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center border border-zinc-200 hover:bg-zinc-50 py-3 rounded-xl text-sm font-semibold transition-colors">
+            <button className="flex items-center justify-center border border-zinc-200 hover:bg-zinc-50 py-3 rounded-xl text-sm font-semibold transition-colors outline-none">
               <GoogleIcon /> Google
             </button>
-            <button className="flex items-center justify-center border border-zinc-200 hover:bg-zinc-50 py-3 rounded-xl text-sm font-semibold transition-colors">
+            <button className="flex items-center justify-center border border-zinc-200 hover:bg-zinc-50 py-3 rounded-xl text-sm font-semibold transition-colors outline-none">
               <FacebookIcon /> Facebook
             </button>
           </div>
 
-          {/* Divider */}
           <div className="relative flex items-center justify-center">
             <div className="border-t border-zinc-200 w-full absolute" />
             <span className="bg-white px-4 relative z-10 text-xs font-bold text-zinc-400 tracking-wider">OR</span>
           </div>
 
-          {/* Registration Input Form */}
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            
-            {/* Name Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Full Name</label>
@@ -160,7 +142,6 @@ export default function RegisterPage({ navigateTo }) {
               </div>
             </div>
 
-            {/* Email Field */}
             <div className="space-y-1">
               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Email</label>
               <div className="relative">
@@ -173,7 +154,6 @@ export default function RegisterPage({ navigateTo }) {
               </div>
             </div>
 
-            {/* Password Field */}
             <div className="space-y-1">
               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Password</label>
               <div className="relative">
@@ -186,26 +166,24 @@ export default function RegisterPage({ navigateTo }) {
               </div>
             </div>
 
-            {/* Submit Action Button */}
             <button 
               type="submit"
-              className="w-full bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] text-[#1B1026] font-bold py-3.5 rounded-xl hover:opacity-95 transition-all shadow-md shadow-[#FF7AB6]/10 mt-6"
+              onClick={() => navigate('/dashboard')}
+              className="w-full bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] text-[#1B1026] font-bold py-3.5 rounded-xl hover:opacity-95 transition-all shadow-md shadow-[#FF7AB6]/10 mt-6 outline-none"
             >
               Sign Up
             </button>
           </form>
 
-          {/* Navigation link to sign in */}
           <div className="text-center text-sm text-zinc-500">
             Already have an account?{' '}
             <button 
-              onClick={() => navigateTo('signin')} 
-              className="text-[#FF7AB6] hover:text-[#FFB86B] font-bold transition-colors underline decoration-[#FF7AB6]/30 underline-offset-4"
+              onClick={() => navigate('/signin')} 
+              className="text-[#FF7AB6] hover:text-[#FFB86B] font-bold transition-colors underline decoration-[#FF7AB6]/30 underline-offset-4 outline-none"
             >
               Sign In
             </button>
           </div>
-
         </div>
       </div>
 

@@ -101,7 +101,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-[#FF7AB6]/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-        <p>Copyright © 2025 KenzaSanaa</p>
+        <p>Copyright © 2026 KenzaSanaa</p>
         <div className="flex items-center gap-4">
           <span>All Rights Reserved</span>
           <span className="text-zinc-800">|</span>
