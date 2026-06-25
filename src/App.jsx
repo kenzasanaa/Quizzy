@@ -6,21 +6,54 @@ import RegisterPage from './form/RegisterPage.jsx';
 import DashboardPage from './DashBord/DashboardPage.jsx';
 import CreateQuizPage from './DashBord/CreateQuizPage.jsx';
 import EventsPage from './Event/EventsPage'; 
-
+import ProtectedRoute from './quizzyBackend/ProtectedRoute';
+import Students from './students/StudentsPage.jsx'; 
 
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* --- Public Routes --- */}
         <Route path="/" element={<QuizzyLandingPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} /> 
-        <Route path="/events" element={<EventsPage />} /> 
-        <Route path="/create-quiz" element={<CreateQuizPage />} />       
 
-
+        {/* --- Protected Routes (Only accessible by authenticated Teachers) --- */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute >
+              <DashboardPage />
+            </ProtectedRoute>
+          } 
+        /> 
+        
+        <Route 
+          path="/events" 
+          element={
+            <ProtectedRoute >
+              <EventsPage />
+            </ProtectedRoute>
+          } 
+        /> 
+        <Route 
+          path="/Students" 
+          element={
+            <ProtectedRoute >
+              <Students />
+            </ProtectedRoute>
+          } 
+        /> 
+        
+        <Route 
+          path="/create-quiz" 
+          element={
+            <ProtectedRoute allowedRole="teacher">
+              <CreateQuizPage />
+            </ProtectedRoute>
+          } 
+        />       
       </Routes>
     </Router>
   );

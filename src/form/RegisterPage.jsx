@@ -18,8 +18,51 @@ const FacebookIcon = () => (
 );
 
 export default function RegisterPage() {
-  const [role, setRole] = useState('student');
   const navigate = useNavigate();
+
+  // 1. New State Variables for Form Fields and Status
+  const [role, setRole] = useState('student');
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // 2. Form Submission Handler to call API
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault(); // Stop page from refreshing
+    setError('');
+    setLoading(true);
+
+    const payload = { fullName, username, email, password, role };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Registration success
+        alert('Account created successfully! Please sign in.');
+        navigate('/signin'); // Go to login screen
+      } else {
+        // Show server-side validation/error messages (e.g. "User already exists")
+        setError(data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('Cannot connect to the server. Make sure your local API is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#1B1026] text-zinc-100 flex flex-col lg:flex-row font-sans">
@@ -115,7 +158,15 @@ export default function RegisterPage() {
             <span className="bg-white px-4 relative z-10 text-xs font-bold text-zinc-400 tracking-wider">OR</span>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          {/* New Error Alert box */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-semibold">
+              {error}
+            </div>
+          )}
+
+          {/* Form Action points to handleSignUpSubmit now */}
+          <form className="space-y-4" onSubmit={handleSignUpSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Full Name</label>
@@ -123,6 +174,9 @@ export default function RegisterPage() {
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                   <input 
                     type="text" 
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     placeholder="John Doe" 
                     className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                   />
@@ -135,6 +189,9 @@ export default function RegisterPage() {
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                   <input 
                     type="text" 
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     placeholder="johndoe123" 
                     className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                   />
@@ -148,6 +205,9 @@ export default function RegisterPage() {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                 <input 
                   type="email" 
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com" 
                   className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                 />
@@ -160,6 +220,9 @@ export default function RegisterPage() {
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                 <input 
                   type="password" 
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••" 
                   className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                 />
@@ -168,10 +231,10 @@ export default function RegisterPage() {
 
             <button 
               type="submit"
-              onClick={() => navigate('/dashboard')}
-              className="w-full bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] text-[#1B1026] font-bold py-3.5 rounded-xl hover:opacity-95 transition-all shadow-md shadow-[#FF7AB6]/10 mt-6 outline-none"
+              disabled={loading}
+              className="w-full bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] text-[#1B1026] font-bold py-3.5 rounded-xl hover:opacity-95 disabled:opacity-50 transition-all shadow-md shadow-[#FF7AB6]/10 mt-6 outline-none"
             >
-              Sign Up
+              {loading ? 'Creating Account...' : 'Sign Up'}
             </button>
           </form>
 

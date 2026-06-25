@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, ArrowLeft } from 'lucide-react';
 
@@ -19,6 +19,56 @@ const FacebookIcon = () => (
 
 export default function SignInPage() {
   const navigate = useNavigate();
+
+  // 1. State Variables for Login Fields
+  const [username, setUsername] = useState(''); // Note: If your API uses only Email/Password, you can keep or hide this
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // 2. Submit Handler to process Login API Call
+  const handleSignInSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const payload = { email, password };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Logged in! Save the token & user role in localStorage
+        localStorage.setItem('quizzyToken', data.token);
+        localStorage.setItem('userRole', data.role);
+
+        alert(`Login successful as ${data.role}!`);
+
+        // Navigate automatically based on role (Authorization)
+        if (data.role === 'teacher') {
+          navigate('/dashboard'); // Replace with your real routes
+        } else {
+          navigate('/events'); // Replace with your real routes
+        }
+      } else {
+        setError(data.message || 'Invalid email or password');
+      }
+    } catch (err) {
+      setError('Cannot connect to the server. Make sure your local API is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#1B1026] text-zinc-100 flex flex-col lg:flex-row font-sans">
@@ -78,13 +128,23 @@ export default function SignInPage() {
             <span className="bg-white px-4 relative z-10 text-xs font-bold text-zinc-400 tracking-wider">OR</span>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          {/* New Error Alert Box */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-semibold">
+              {error}
+            </div>
+          )}
+
+          {/* Form Action points to handleSignInSubmit now */}
+          <form className="space-y-4" onSubmit={handleSignInSubmit}>
             <div className="space-y-1">
               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Username</label>
               <div className="relative">
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                 <input 
                   type="text" 
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   placeholder="johndoe123" 
                   className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                 />
@@ -97,6 +157,9 @@ export default function SignInPage() {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                 <input 
                   type="email" 
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com" 
                   className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                 />
@@ -109,18 +172,22 @@ export default function SignInPage() {
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                 <input 
                   type="password" 
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••" 
                   className="w-full bg-zinc-50 text-sm border border-zinc-200 hover:border-zinc-300 focus:border-[#FF7AB6] focus:bg-white rounded-xl py-3 pl-10 pr-4 outline-none transition-all text-[#1B1026]" 
                 />
               </div>
             </div>
 
+            {/* Fixed Button Action (Sign Up -> Sign In) */}
             <button 
               type="submit"
-              onClick={() => navigate('/dashboard')}
-              className="w-full bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] text-[#1B1026] font-bold py-3.5 rounded-xl hover:opacity-95 transition-all shadow-md shadow-[#FF7AB6]/10 mt-6 outline-none"
+              disabled={loading}
+              className="w-full bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] text-[#1B1026] font-bold py-3.5 rounded-xl hover:opacity-95 disabled:opacity-50 transition-all shadow-md shadow-[#FF7AB6]/10 mt-6 outline-none"
             >
-              Sign Up
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 

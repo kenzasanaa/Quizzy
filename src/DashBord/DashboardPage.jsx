@@ -15,7 +15,7 @@ import {
   Menu,
   X,
   Info,
-  Clock // Added Clock icon import
+  Clock 
 } from 'lucide-react';
 
 // --- HELPER CONVERTERS FOR DATE/TIME PICKERS ---
@@ -79,35 +79,52 @@ export default function DashboardPage() {
   const [editTime, setEditTime] = useState('');
   const [editDesc, setEditDesc] = useState('');
 
-  // Загружаем списки из LocalStorage
-  const [quizzesList, setQuizzesList] = useState(() => {
-    const saved = localStorage.getItem('quizzesList');
-    if (saved) return JSON.parse(saved);
-    return [
-      { id: 1, title: 'Introduction to Biology', questions: 15, completions: 28, rate: 75 },
-      { id: 2, title: 'Introduction to Biology', questions: 15, completions: 28, rate: 40 },
-      { id: 3, title: 'Introduction to Biology', questions: 15, completions: 28, rate: 90 },
-    ];
-  });
+  // --- BACKEND API CONNECTED STATES ---
+  const [teacherName, setTeacherName] = useState('Teacher');
+  const [quizzesList, setQuizzesList] = useState([]);
+  const [eventsList, setEventsList] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [apiError, setApiError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const [eventsList, setEventsList] = useState(() => {
-    const saved = localStorage.getItem('eventsList');
-    if (saved) return JSON.parse(saved);
-    return [
-      { id: 1, title: 'Science Mid-term Quiz', time: '2026-06-24, 15:30', participants: '32 participants', isLive: false, date: '2026-06-24', clockTime: '15:30', description: 'A mid-term science quiz covering Biology and Physics topics.' },
-      { id: 2, title: 'Mathematics Weekly Test', time: '2026-06-25, 10:00', participants: '28 participants', isLive: false, date: '2026-06-25', clockTime: '10:00', description: 'A weekly mathematics test covering calculus and algebra.' },
-      { id: 3, title: 'History Final Exam', time: '2026-06-26, 09:00', participants: '45 participants', isLive: false, date: '2026-06-26', clockTime: '09:00', description: 'The final exam for the world history course.' },
-    ];
-  });
+  // --- RETRIEVE USER ROLE FOR CONDITIONAL RENDERING ---
+  const userRole = localStorage.getItem('userRole'); // 'teacher' or 'student'
 
-  // Синхронизируем изменения с localStorage
+  // --- FETCH DATA FROM THE SERVER ON MOUNT ---
   useEffect(() => {
-    localStorage.setItem('quizzesList', JSON.stringify(quizzesList));
-  }, [quizzesList]);
+    const fetchDashboardData = async () => {
+      const token = localStorage.getItem('quizzyToken');
 
-  useEffect(() => {
-    localStorage.setItem('eventsList', JSON.stringify(eventsList));
-  }, [eventsList]);
+      try {
+        const response = await fetch('http://localhost:5000/api/teacher/dashboard-data', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setTeacherName(data.teacherName);
+          setQuizzesList(data.quizzesList);
+          setEventsList(data.eventsList);
+          setStats(data.stats);
+        } else {
+          setApiError(data.message || 'Unauthorized session');
+          // If token has expired, kick them back to login page
+          localStorage.clear();
+          navigate('/signin');
+        }
+      } catch (err) {
+        setApiError('Unable to fetch dashboard data. Server is offline.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [navigate]);
 
   // Проверка статуса планирования для карточки квиза
   const getQuizScheduleStatus = (title) => {
@@ -154,7 +171,8 @@ export default function DashboardPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleSaveEvent = () => {
+  // --- API PUT: UPDATE EVENT ON THE SERVER ---
+  const handleSaveEvent = async () => {
     if (!editDate) {
       setValidationError("Please select a date.");
       return;
@@ -171,40 +189,66 @@ export default function DashboardPage() {
     }
 
     setValidationError('');
-    setEventsList(eventsList.map(e => {
-      if (e.id === editingEvent.id) {
-        return {
-          ...e,
-          title: editTitle,
-          date: editDate,
-          clockTime: editTime,
-          description: editDesc,
-          time: `${editDate}, ${editTime}` 
-        };
+
+    const updatedData = {
+      title: editTitle,
+      date: editDate,
+      clockTime: editTime,
+      description: editDesc,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/events/${editingEvent.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Sync our local react state with the server's response
+        setEventsList(eventsList.map(e => (e.id === editingEvent.id ? data.event : e)));
+        setIsEditModalOpen(false);
+      } else {
+        setValidationError(data.message || 'Failed to update event.');
       }
-      return e;
-    }));
-    setIsEditModalOpen(false);
+    } catch (err) {
+      setValidationError('Server connection failed. Could not save changes.');
+    }
   };
 
-  const handleDeleteEvent = () => {
-    setEventsList(eventsList.filter(e => e.id !== editingEvent.id));
-    setIsEditModalOpen(false);
+  // --- API DELETE: DELETE EVENT ON THE SERVER ---
+  const handleDeleteEvent = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/events/${editingEvent.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setEventsList(eventsList.filter(e => e.id !== editingEvent.id));
+        setIsEditModalOpen(false);
+      } else {
+        setValidationError('Failed to delete event from the server.');
+      }
+    } catch (err) {
+      setValidationError('Server connection failed. Could not delete event.');
+    }
   };
 
-  // Added route path tracking to the navigation items
+  const handleLogout = () => {
+    localStorage.removeItem('quizzyToken');
+    localStorage.removeItem('userRole');
+    navigate('/signin');
+  };
+
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { id: 'quizzes', label: 'Quizzes', icon: BookOpen, path: '/quizzes' },
     { id: 'events', label: 'Events', icon: Calendar, path: '/events' },
     { id: 'students', label: 'Students', icon: Users, path: '/students' },
-  ];
-
-  const stats = [
-    { label: 'Total Quizzes', value: quizzesList.length + 2540, change: '+12.5%', icon: BookOpen, color: '#FF7AB6' },
-    { label: 'Active Events', value: '2,543', change: '+12.5%', icon: Calendar, color: '#FFB86B' },
-    { label: 'Students', value: '2,543', change: '+12.5%', icon: Users, color: '#FFD166' },
-    { label: 'Avg. Completion', value: '2,543', change: '-12.5%', icon: BarChart2, color: '#FF7AB6', isNegative: true },
   ];
 
   const topStudents = [
@@ -249,7 +293,6 @@ export default function DashboardPage() {
               <button
                 key={item.id}
                 onClick={() => {
-                  // Direct to route paths instead of changing active tab locally
                   if (item.path) {
                     navigate(item.path);
                   } else {
@@ -280,7 +323,7 @@ export default function DashboardPage() {
       </div>
 
       <button 
-        onClick={() => navigate('/')}
+        onClick={handleLogout}
         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/5 transition-colors outline-none mt-8"
       >
         <LogOut size={18} />
@@ -288,6 +331,18 @@ export default function DashboardPage() {
       </button>
     </div>
   );
+
+  // Loader view while loading from the API
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#1B1026] flex items-center justify-center text-zinc-300">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 border-4 border-t-[#FF7AB6] border-zinc-800 rounded-full animate-spin mx-auto"></div>
+          <p className="text-sm font-semibold">Loading your Quizzy dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1B1026] text-zinc-100 flex font-sans overflow-x-hidden">
@@ -334,33 +389,47 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <button 
-            onClick={() => navigate('/create-quiz')}
-            className="border border-[#FF7AB6]/40 hover:border-[#FF7AB6] text-[#FF7AB6] font-semibold px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all bg-[#FF7AB6]/5 outline-none whitespace-nowrap"
-          >
-            <Plus size={16} /> Create Quiz
-          </button>
+          {/* Conditional Rendering: Hide Header Create Quiz button for Students */}
+          {userRole === 'teacher' && (
+            <button 
+              onClick={() => navigate('/create-quiz')}
+              className="border border-[#FF7AB6]/40 hover:border-[#FF7AB6] text-[#FF7AB6] font-semibold px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all bg-[#FF7AB6]/5 outline-none whitespace-nowrap"
+            >
+              <Plus size={16} /> Create Quiz
+            </button>
+          )}
         </header>
 
         <div className="grow p-4 sm:p-8 space-y-8 overflow-y-auto max-w-full">
           
+          {/* Error Warning */}
+          {apiError && (
+            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl text-xs font-bold">
+              {apiError}
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Dashboard</h1>
-              <p className="text-zinc-400 text-xs sm:text-sm">Welcome back, Sarah! Here's what's happening with your quizzes</p>
+              <p className="text-zinc-400 text-xs sm:text-sm">Welcome back, {teacherName}! Here's what's happening with your quizzes</p>
             </div>
             
-            <button 
-              onClick={() => navigate('/create-quiz')}
-              className="bg-linear-to-r from-[#FF7AB6] to-[#FFB86B] text-[#1B1026] hover:opacity-95 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-[#FF7AB6]/10 outline-none w-max"
-            >
-              <Plus size={16} /> Create New Quiz
-            </button>
+            {/* Conditional Rendering: Hide Header Create New Quiz button for Students */}
+            {userRole === 'teacher' && (
+              <button 
+                onClick={() => navigate('/create-quiz')}
+                className="bg-linear-to-r from-[#FF7AB6] to-[#FFB86B] text-[#1B1026] hover:opacity-95 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-[#FF7AB6]/10 outline-none w-max"
+              >
+                <Plus size={16} /> Create New Quiz
+              </button>
+            )}
           </div>
 
+          {/* Dynamic Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat, idx) => {
-              const IconComp = stat.icon;
+              const IconComp = stat.icon === Calendar ? Calendar : stat.icon === Users ? Users : stat.icon === BarChart2 ? BarChart2 : BookOpen;
               return (
                 <div key={idx} className="bg-[#251836]/80 border border-[#FF7AB6]/5 p-5 rounded-2xl flex items-center justify-between">
                   <div className="space-y-1">
@@ -390,7 +459,6 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-3">
-                {/* Only rendering the top 3 most recent events */}
                 {eventsList.slice(-3).reverse().map((evt) => (
                   <div key={evt.id} className="bg-[#1B1026]/60 border border-zinc-800/40 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -407,16 +475,15 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <button 
-                      onClick={() => handleOpenEditModal(evt)}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold transition-all outline-none ${
-                        evt.isLive 
-                          ? 'bg-[#FF7AB6] hover:bg-[#FF7AB6]/90 text-white' 
-                          : 'border border-[#FF7AB6]/40 hover:border-[#FF7AB6] text-[#FF7AB6]'
-                      }`}
-                    >
-                      Manage
-                    </button>
+                    {/* Conditional Rendering: Hide Manage button on events for Students */}
+                    {userRole === 'teacher' && (
+                      <button 
+                        onClick={() => handleOpenEditModal(evt)}
+                        className={`w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold transition-all outline-none border border-[#FF7AB6]/40 hover:border-[#FF7AB6] text-[#FF7AB6]`}
+                      >
+                        Manage
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -459,7 +526,6 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Only rendering the top 3 most recent quizzes */}
               {quizzesList.slice(-3).reverse().map((quiz, idx) => {
                 const scheduleStatus = getQuizScheduleStatus(quiz.title);
                 const isUnscheduled = scheduleStatus === "Not scheduled";
@@ -477,7 +543,6 @@ export default function DashboardPage() {
                         <span>{quiz.completions} completions</span>
                       </div>
 
-                      {/* Display scheduling status under the quiz details */}
                       <div className="text-[11px] font-bold">
                         {isUnscheduled ? (
                           <span className="text-rose-400/90 bg-rose-500/10 px-2 py-0.5 rounded-md inline-block">
@@ -507,18 +572,21 @@ export default function DashboardPage() {
                 );
               })}
 
-              <button 
-                onClick={() => navigate('/create-quiz')}
-                className="border-2 border-dashed border-zinc-800 hover:border-[#FF7AB6]/40 rounded-2xl p-5 flex flex-col items-center justify-center text-center h-52 gap-3 group transition-all outline-none w-full"
-              >
-                <div className="p-2.5 rounded-xl bg-[#1B1026] border border-zinc-800 text-zinc-500 group-hover:text-[#FF7AB6] group-hover:border-[#FF7AB6]/30 transition-all">
-                  <Plus size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-xs text-zinc-300 group-hover:text-white transition-colors">Create New Quiz</h4>
-                  <p className="text-[10px] text-zinc-500 leading-snug max-w-[150px] mx-auto mt-0.5">Add questions, set time limits and more</p>
-                </div>
-              </button>
+              {/* Conditional Rendering: Hide Create New Quiz Card for Students */}
+              {userRole === 'teacher' && (
+                <button 
+                  onClick={() => navigate('/create-quiz')}
+                  className="border-2 border-dashed border-zinc-800 hover:border-[#FF7AB6]/40 rounded-2xl p-5 flex flex-col items-center justify-center text-center h-52 gap-3 group transition-all outline-none w-full"
+                >
+                  <div className="p-2.5 rounded-xl bg-[#1B1026] border border-zinc-800 text-zinc-500 group-hover:text-[#FF7AB6] group-hover:border-[#FF7AB6]/30 transition-all">
+                    <Plus size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xs text-zinc-300 group-hover:text-white transition-colors">Create New Quiz</h4>
+                    <p className="text-[10px] text-zinc-500 leading-snug max-w-37.5 mx-auto mt-0.5">Add questions, set time limits and more</p>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 
@@ -539,7 +607,6 @@ export default function DashboardPage() {
 
             <h2 className="text-2xl font-black text-white leading-none">Edit Quiz</h2>
 
-            {/* Validation warning */}
             {validationError && (
               <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs py-3 px-4 rounded-xl flex items-start gap-2 animate-pulse">
                 <Info size={16} className="shrink-0 mt-0.5" />

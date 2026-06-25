@@ -67,6 +67,9 @@ export default function EventsPage() {
   const [scheduleEventAvailability, setScheduleEventAvailability] = useState('Only visible to invited students');
   const [modalValidationError, setModalValidationError] = useState('');
 
+  // --- RETRIEVE USER ROLE FOR CONDITIONAL RENDERING ---
+  const userRole = localStorage.getItem('userRole'); // 'teacher' or 'student'
+
   // Loaded lists from LocalStorage
   const [quizzesList] = useState(() => {
     const saved = localStorage.getItem('quizzesList');
@@ -242,7 +245,7 @@ export default function EventsPage() {
     <div className="flex flex-col justify-between h-full">
       <div className="space-y-8">
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-black tracking-wider bg-linear-to-r from-[#DB95AC] via-[#FBB9A6] to-[#FCE0CA] bg-clip-text text-transparent">
+          <span className="text-2xl font-black tracking-wider bg-linear-to-r from-[#FF7AB6] via-[#FFB86B] to-[#FFD166] bg-clip-text text-transparent">
             Quizzy
           </span>
           {isMobile && (
@@ -260,7 +263,7 @@ export default function EventsPage() {
           <input 
             type="text" 
             placeholder="Search" 
-            className="w-full bg-[#170E2A]/80 text-sm border border-zinc-800/80 rounded-xl py-2.5 pl-9 pr-4 text-zinc-300 placeholder-zinc-500 outline-none focus:border-[#FBB9A6]/40" 
+            className="w-full bg-[#170E2A]/80 text-sm border border-zinc-800/80 rounded-xl py-2.5 pl-9 pr-4 text-zinc-300 placeholder-zinc-500 outline-none focus:border-[#FF7AB6]/40" 
           />
         </div>
 
@@ -277,7 +280,7 @@ export default function EventsPage() {
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all outline-none ${
                   isActive 
-                    ? 'bg-[#9396C2] text-[#170E2A] font-bold shadow-lg shadow-[#9396C2]/20' 
+                    ? 'bg-[#FF7AB6] text-[#170E2A] font-bold shadow-lg shadow-[#9396C2]/20' 
                     : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -299,7 +302,7 @@ export default function EventsPage() {
 
       <button 
         onClick={() => navigate('/')}
-        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-300/80 hover:text-rose-200 hover:bg-rose-500/5 transition-colors outline-none mt-8"
+        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/5 transition-colors outline-none mt-8"
       >
         <LogOut size={18} />
         Log Out
@@ -308,10 +311,10 @@ export default function EventsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#170E2A] text-zinc-100 flex font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#1B1026] text-zinc-100 flex font-sans overflow-x-hidden">
       
       {/* DESKTOP SIDEBAR */}
-      <aside className="hidden lg:flex w-64 bg-[#110726] border-r border-[#FBB9A6]/10 flex-col p-6 shrink-0 h-screen sticky top-0">
+      <aside className="hidden lg:flex w-64 bg-[#120a1a] border-r border-[#FF7AB6]/10 flex-col p-6 shrink-0 h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
@@ -323,7 +326,7 @@ export default function EventsPage() {
         />
       )}
       <aside 
-        className={`fixed inset-y-0 left-0 w-64 bg-[#110726] border-r border-[#FBB9A6]/10 p-6 z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 left-0 w-64 bg-[#120a1a] border-r border-[#FF7AB6]/10 p-6 z-50 transform transition-transform duration-300 lg:hidden ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -333,11 +336,11 @@ export default function EventsPage() {
       {/* CONTENT PANEL */}
       <div className="grow flex flex-col min-h-screen min-w-0">
         
-        <header className="h-20 border-b border-[#FBB9A6]/10 px-4 sm:px-8 flex items-center justify-between gap-4 shrink-0">
+        <header className="h-20 border-b border-[#FF7AB6]/10 px-4 sm:px-8 flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="lg:hidden text-zinc-300 hover:text-white p-2 border border-zinc-800 rounded-xl bg-[#211736]/40 cursor-pointer"
+              className="lg:hidden text-zinc-300 hover:text-white p-2 border border-zinc-800 rounded-xl bg-[#251836]/40 cursor-pointer"
             >
               <Menu size={20} />
             </button>
@@ -347,18 +350,20 @@ export default function EventsPage() {
               <input 
                 type="text" 
                 placeholder="Search..." 
-                className="w-full bg-[#211736]/40 text-sm border border-zinc-800 rounded-xl py-2 pl-10 pr-4 text-zinc-300 placeholder-zinc-500 outline-none focus:border-[#FBB9A6]/40" 
+                className="w-full bg-[#251836]/40 text-sm border border-zinc-800 rounded-xl py-2 pl-10 pr-4 text-zinc-300 placeholder-zinc-500 outline-none focus:border-[#FF7AB6]/40" 
               />
             </div>
           </div>
 
-          {/* Screenshot 1: Outlined pastel peach header Create Quiz button */}
-          <button 
-            onClick={() => navigate('/create-quiz')}
-            className="border border-[#FBB9A6]/30 hover:border-[#FBB9A6] text-[#FBB9A6] font-semibold px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all bg-[#FBB9A6]/5 outline-none whitespace-nowrap"
-          >
-            <Plus size={16} /> Create Quiz
-          </button>
+          {/* Conditional Rendering: Hide Header Create Quiz button for Students */}
+          {userRole === 'teacher' && (
+            <button 
+              onClick={() => navigate('/create-quiz')}
+              className="border border-[#FF7AB6]/30 hover:border-[#FF7AB6] text-[#FF7AB6] font-semibold px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all bg-[#FF7AB6]/5 outline-none whitespace-nowrap"
+            >
+              <Plus size={16} /> Create Quiz
+            </button>
+          )}
         </header>
 
         {/* PAGE BODY */}
@@ -370,26 +375,28 @@ export default function EventsPage() {
               <p className="text-zinc-400 text-xs sm:text-sm">Schedule and manage quiz sessions for your students</p>
             </div>
             
-            {/* Screenshot 1: Filled slate-lavender Schedule Event button */}
-            <button 
-              onClick={() => {
-                setModalValidationError('');
-                setScheduleEventQuizId('');
-                setIsScheduleModalOpen(true);
-              }}
-              className="bg-[#9499C3] hover:bg-[#8C88BA] text-[#170E2A] font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-[#9499C3]/20 outline-none"
-            >
-              <Calendar size={16} /> Schedule Event
-            </button>
+            {/* Conditional Rendering: Hide Schedule Event button for Students */}
+            {userRole === 'teacher' && (
+              <button 
+                onClick={() => {
+                  setModalValidationError('');
+                  setScheduleEventQuizId('');
+                  setIsScheduleModalOpen(true);
+                }}
+                className="bg-linear-to-r from-[#FF7AB6] to-[#FFB86B] text-[#1B1026] hover:opacity-95 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-[#FF7AB6]/10 outline-none w-max"
+              >
+                <Calendar size={16} /> Schedule Event
+              </button>
+            )}
           </div>
 
           {/* Card Container matches screenshot 2 */}
-          <div className="bg-[#110726] border border-zinc-800/80 rounded-3xl p-6 space-y-6 shadow-xl">
+          <div className="bg-[#251836]/80 border border-[#FF7AB6]/5 rounded-3xl p-6 space-y-6 shadow-xl">
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800/40">
               <div className="space-y-0.5">
                 <h3 className="text-lg font-black text-white">Event Calendar</h3>
-                <p className="text-zinc-500 text-xs">View and manage your scheduled quiz events</p>
+                <p className="text-zinc-400 text-xs">View and manage your scheduled quiz events</p>
               </div>
 
               {/* Filters Panel */}
@@ -408,7 +415,7 @@ export default function EventsPage() {
                 <select 
                   value={selectedQuizFilter}
                   onChange={(e) => setSelectedQuizFilter(e.target.value)}
-                  className="bg-[#170E2A]/90 text-xs border border-zinc-800 focus:border-[#FBB9A6]/40 rounded-xl py-2 px-3 text-zinc-300 outline-none"
+                  className="bg-[#170E2A]/90 border border-zinc-800/40 text-xs border  focus:border-[#FBB9A6]/40 rounded-xl py-2 px-3 text-zinc-300 outline-none"
                 >
                   <option value="All Quizzes">All Quizzes</option>
                   {quizzesList.map(q => (
@@ -426,7 +433,7 @@ export default function EventsPage() {
                   onClick={() => setEventFilter(tab)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     (eventFilter === tab) 
-                      ? 'bg-[#211736] text-[#FBB9A6] shadow-sm font-bold' 
+                      ? 'bg-[#170E2A] text-[#FF7AB6] shadow-sm font-bold' 
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -449,16 +456,16 @@ export default function EventsPage() {
                   return (
                     <div 
                       key={evt.id}
-                      className="p-4 rounded-2xl border bg-[#170E2A]/40 border-zinc-800/50 hover:border-zinc-800 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative"
+                      className="p-4 rounded-2xl border bg-[#1B1026]/60 border border-zinc-800/40 hover:border-zinc-800 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative"
                     >
                       <div className="flex items-start gap-4 min-w-0">
                         {/* Dynamic Wrapper Styling matches Image 4 & 5 */}
                         {evt.iconType === 'book' ? (
-                          <div className="p-3.5 rounded-xl border shrink-0 bg-[#211736] text-[#9396C2] border-[#9396C2]/10">
+                          <div className="p-3.5 rounded-xl border shrink-0 bg-[#170E2A] text-[#9396C2] border-[#9396C2]/10">
                             <BookOpen size={18} />
                           </div>
                         ) : (
-                          <div className="p-3.5 rounded-xl border shrink-0 bg-[#3a202d] text-[#FBB9A6] border-[#FBB9A6]/15">
+                          <div className="p-3.5 rounded-xl border shrink-0 bg-[#FFB86B]/15 text-[#FFB86B] border-[#FFB86B]/20">
                             <Calendar size={18} />
                           </div>
                         )}
@@ -508,25 +515,31 @@ export default function EventsPage() {
                             View Live
                           </button>
                         ) : (
+                          /* Conditional Rendering: Hide Manage button for Students */
+                          userRole === 'teacher' && (
+                            <button 
+                              className="px-4 py-2 border border-[#FF7AB6]/40 hover:border-[#FF7AB6] text-[#FF7AB6] rounded-xl text-xs font-bold transition-all outline-none"
+                            >
+                              Manage
+                            </button>
+                          )
+                        )}
+
+                        {/* Conditional Rendering: Hide Actions (Edit/Delete Menu toggler) for Students */}
+                        {userRole === 'teacher' && (
                           <button 
-                            className="px-4 py-2 border border-zinc-800 hover:border-zinc-700 hover:bg-white/5 text-zinc-300 hover:text-white rounded-xl text-xs font-bold transition-all outline-none"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveDropdownId(isMenuOpen ? null : evt.id);
+                            }}
+                            className="p-2 hover:bg-zinc-800/40 text-zinc-500 hover:text-white rounded-xl transition-colors outline-none"
                           >
-                            Manage
+                            <MoreVertical size={16} />
                           </button>
                         )}
 
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveDropdownId(isMenuOpen ? null : evt.id);
-                          }}
-                          className="p-2 hover:bg-zinc-800/40 text-zinc-500 hover:text-white rounded-xl transition-colors outline-none"
-                        >
-                          <MoreVertical size={16} />
-                        </button>
-
                         {/* Screenshot 3: Absolute Dropdown Action Menu */}
-                        {isMenuOpen && (
+                        {userRole === 'teacher' && isMenuOpen && (
                           <div 
                             onClick={(e) => e.stopPropagation()}
                             className="absolute right-0 top-11 bg-[#110726] border border-zinc-800 rounded-2xl p-2 w-44 shadow-2xl z-40 animate-in fade-in slide-in-from-top-1 duration-150"
