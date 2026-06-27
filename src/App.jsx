@@ -7,8 +7,10 @@ import DashboardPage from './DashBord/DashboardPage.jsx';
 import CreateQuizPage from './DashBord/CreateQuizPage.jsx';
 import EventsPage from './Event/EventsPage'; 
 import ProtectedRoute from './quizzyBackend/ProtectedRoute';
-import Students from './students/StudentsPage.jsx'; 
-
+import Students from './students/StudentsPage.jsx';
+import Quizzes from './Quizzes/QuizzesPage.jsx';
+import QuizDetailsPage from './Quizzes/details/QuizDetailsPage';
+import QuizActivePage from './Quizzes/QuizActivePage'; 
 
 function App() {
   return (
@@ -19,12 +21,40 @@ function App() {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* --- Protected Routes (Only accessible by authenticated Teachers) --- */}
+        {/* --- Protected Routes --- */}
         <Route 
           path="/dashboard" 
           element={
             <ProtectedRoute >
               <DashboardPage />
+            </ProtectedRoute>
+          } 
+        /> 
+        <Route 
+          path="/quizzes" 
+          element={
+            <ProtectedRoute >
+              <Quizzes />
+            </ProtectedRoute>
+          } 
+        /> 
+
+        {/* --- Clicking Quiz Title routes here (Details/Analytics) --- */}
+        <Route 
+          path="/quizzes/:id"
+          element={
+            <ProtectedRoute >
+              <QuizDetailsPage  />
+            </ProtectedRoute>
+          } 
+        /> 
+
+        {/* --- Clicking 'View' routes here (Quiz Gameplay Page) --- */}
+        <Route 
+          path="/quizzes/:id/play"
+          element={
+            <ProtectedRoute >
+              <QuizActivePage  />
             </ProtectedRoute>
           } 
         /> 
