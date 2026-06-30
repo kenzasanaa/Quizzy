@@ -309,6 +309,7 @@ export default function QuizzesPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 shrink-0 mt-2 sm:mt-0">
+                      {/* Play/View Button - Everyone sees this */}
                       <button
                         onClick={() => handlePlayQuiz(quiz.id)}
                         className="px-3 sm:px-4 py-2 text-xs font-semibold rounded-xl border border-zinc-700 text-white hover:bg-[#FF7AB6] hover:border-[#FF7AB6] hover:text-[#1B1026] transition-all flex items-center gap-1.5"
@@ -316,65 +317,71 @@ export default function QuizzesPage() {
                         <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> View
                       </button>
 
-                      <button
-                        onClick={() => handleViewDetails(quiz.id)}
-                        className="p-2 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-all hidden sm:flex"
-                        title="Details & Analytics"
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                      </button>
-
-                      <div className="relative" ref={activeDropdownId === quiz.id ? dropdownRef : null}>
+                      {/* Analytics Button - TEACHER ONLY */}
+                      {userRole === 'teacher' && (
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveDropdownId(activeDropdownId === quiz.id ? null : quiz.id);
-                          }}
-                          className="p-2 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-all"
+                          onClick={() => handleViewDetails(quiz.id)}
+                          className="p-2 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-all hidden sm:flex"
+                          title="Details & Analytics"
                         >
-                          <MoreVertical className="w-4 h-4" />
+                          <BarChart3 className="w-4 h-4" />
                         </button>
+                      )}
 
-                        {activeDropdownId === quiz.id && (
-                          <div className="absolute right-0 top-full mt-2 w-44 bg-[#2D1B3D] border border-[#FF7AB6]/10 rounded-xl shadow-2xl shadow-black/40 py-1.5 z-20 overflow-hidden">
-                            <div className="px-3 py-2 border-b border-zinc-700/50 mb-1">
-                              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Action Menu</p>
+                      {/* 3-dot menu - TEACHER ONLY */}
+                      {userRole === 'teacher' && (
+                        <div className="relative" ref={activeDropdownId === quiz.id ? dropdownRef : null}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveDropdownId(activeDropdownId === quiz.id ? null : quiz.id);
+                            }}
+                            className="p-2 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-all"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+
+                          {activeDropdownId === quiz.id && (
+                            <div className="absolute right-0 top-full mt-2 w-44 bg-[#2D1B3D] border border-[#FF7AB6]/10 rounded-xl shadow-2xl shadow-black/40 py-1.5 z-20 overflow-hidden">
+                              <div className="px-3 py-2 border-b border-zinc-700/50 mb-1">
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Action Menu</p>
+                              </div>
+                              <button
+                                onClick={() => { handleEdit(quiz); setActiveDropdownId(null); }}
+                                className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" /> Edit Title
+                              </button>
+                              <button
+                                onClick={() => { handleDuplicate(quiz); setActiveDropdownId(null); }}
+                                className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
+                              >
+                                <Copy className="w-3.5 h-3.5" /> Duplicate
+                              </button>
+                              <button
+                                onClick={() => { handleTogglePublish(quiz); setActiveDropdownId(null); }}
+                                className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
+                              >
+                                <Eye className="w-3.5 h-3.5" /> 
+                                {quiz.status === 'Published' ? 'Unpublish' : 'Publish'}
+                              </button>
+                              <button
+                                onClick={() => { handleShare(quiz); setActiveDropdownId(null); }}
+                                className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
+                              >
+                                <Share2 className="w-3.5 h-3.5" /> Share Link
+                              </button>
+                              <div className="my-1 border-t border-zinc-700/50" />
+                              <button
+                                onClick={() => { handleDelete(quiz); setActiveDropdownId(null); }}
+                                className="w-full px-4 py-2 text-left text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5 transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                              </button>
                             </div>
-                            <button
-                              onClick={() => { handleEdit(quiz); setActiveDropdownId(null); }}
-                              className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
-                            >
-                              <Edit3 className="w-3.5 h-3.5" /> Edit Title
-                            </button>
-                            <button
-                              onClick={() => { handleDuplicate(quiz); setActiveDropdownId(null); }}
-                              className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
-                            >
-                              <Copy className="w-3.5 h-3.5" /> Duplicate
-                            </button>
-                            <button
-                              onClick={() => { handleTogglePublish(quiz); setActiveDropdownId(null); }}
-                              className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
-                            >
-                              <Eye className="w-3.5 h-3.5" /> 
-                              {quiz.status === 'Published' ? 'Unpublish' : 'Publish'}
-                            </button>
-                            <button
-                              onClick={() => { handleShare(quiz); setActiveDropdownId(null); }}
-                              className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
-                            >
-                              <Share2 className="w-3.5 h-3.5" /> Share Link
-                            </button>
-                            <div className="my-1 border-t border-zinc-700/50" />
-                            <button
-                              onClick={() => { handleDelete(quiz); setActiveDropdownId(null); }}
-                              className="w-full px-4 py-2 text-left text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5 transition-colors"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" /> Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

@@ -1,11 +1,14 @@
 import React from 'react';
 
-const TABS = ['Profile', 'Account', 'Notifications', 'Billing'];
+const TEACHER_TABS = ['Profile', 'Account', 'Notifications', 'Billing'];
+const STUDENT_TABS = ['Profile', 'Account', 'Notifications'];
 
-export default function SettingsTabs({ activeTab, onTabChange }) {
+export default function SettingsTabs({ activeTab, onTabChange, userRole }) {
+  const tabs = userRole === 'teacher' ? TEACHER_TABS : STUDENT_TABS;
+
   return (
     <div className="flex items-center gap-1 bg-[#1B1026]/60 rounded-xl p-1 w-max overflow-x-auto max-w-full">
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <button
           key={tab}
           onClick={() => onTabChange(tab)}
@@ -20,4 +23,4 @@ export default function SettingsTabs({ activeTab, onTabChange }) {
       ))}
     </div>
   );
-}
+}   

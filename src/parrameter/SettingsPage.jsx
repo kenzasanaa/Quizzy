@@ -12,6 +12,8 @@ import ComingSoonTab from './ComingSoonTab';
 export default function SettingsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Profile');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const userRole = localStorage.getItem('userRole') || 'teacher';
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -22,7 +24,7 @@ export default function SettingsPage() {
       case 'Notifications':
         return <NotificationsTab />;
       case 'Billing':
-        return <BillingTab />;
+        return userRole === 'teacher' ? <BillingTab /> : <ComingSoonTab title="Billing" />;
       default:
         return <ComingSoonTab title={activeTab} />;
     }
@@ -36,28 +38,37 @@ export default function SettingsPage() {
         <Sidebar activeTab="settings" navigate={navigate} />
       </aside>
 
-      {/* Mobile Sidebar */}
-      <MobileSidebar navigate={navigate} />
+      {/* Mobile Drawer */}
+      {isMobileSidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/60 z-50 lg:hidden backdrop-blur-sm" onClick={() => setIsMobileSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-64 bg-[#120a1a] border-r border-[#FF7AB6]/10 p-6 z-50 transform translate-x-0 transition-transform duration-300 lg:hidden">
+            <Sidebar activeTab="settings" isMobile onClose={() => setIsMobileSidebarOpen(false)} navigate={navigate} />
+          </aside>
+        </>
+      )}
 
       {/* Main Content */}
       <div className="grow flex flex-col min-h-screen min-w-0">
         <Header 
-          userRole="teacher" 
-          onMenuClick={() => {}} 
-          onCreateQuiz={() => navigate('/create-quiz')} 
+          userRole={userRole} 
+          onMenuClick={() => setIsMobileSidebarOpen(true)} 
+          onCreateQuiz={null}  // ← HIDE CREATE QUIZ BUTTON: pass null or undefined
         />
 
         <div className="grow p-6 sm:p-10 max-w-5xl mx-auto w-full overflow-y-auto">
-          {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">Settings</h1>
             <p className="text-zinc-400 text-sm">Manage your account settings and preferences</p>
           </div>
 
-          {/* Main Card */}
           <div className="bg-[#251836]/80 border border-[#FF7AB6]/10 rounded-3xl shadow-xl overflow-hidden">
             <div className="px-6 pt-6 pb-2 border-b border-[#FF7AB6]/10">
-              <SettingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+              <SettingsTabs 
+                activeTab={activeTab} 
+                onTabChange={setActiveTab} 
+                userRole={userRole}
+              />
             </div>
             <div className="p-6 sm:p-8">
               {renderTabContent()}
@@ -66,25 +77,5 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function MobileSidebar({ navigate }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 z-50 lg:hidden backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-      <aside className={`fixed inset-y-0 left-0 w-64 bg-[#120a1a] border-r border-[#FF7AB6]/10 p-6 z-50 transform transition-transform duration-300 lg:hidden ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <Sidebar activeTab="settings" isMobile onClose={() => setIsOpen(false)} navigate={navigate} />
-      </aside>
-    </>
   );
 }
