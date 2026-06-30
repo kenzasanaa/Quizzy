@@ -85,12 +85,13 @@ export default function QuizDetailsPage() {
           {/* Header Block with controls */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
-              <button 
-                onClick={() => navigate('/quizzes')}
-                className="p-3.5 bg-[#170E2A]/60 border border-zinc-800/80 hover:border-[#FF7AB6]/30 rounded-2xl text-zinc-400 hover:text-white transition-all outline-none cursor-pointer"
-              >
-                <ChevronLeft size={16} />
-              </button>
+            <button 
+              onClick={() => navigate(`/quizzes/${id}/play`)}
+              className="px-5 py-2.5 bg-[#9396C2] hover:bg-[#8C88BA] text-[#170E2A] rounded-xl text-xs font-bold"
+            >
+              Preview
+            </button>
+
               <div className="space-y-1">
                 <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white leading-none">Introduction to Biology</h1>
                 <p className="text-zinc-400 text-xs sm:text-sm">Basic concepts of biology for beginners</p>

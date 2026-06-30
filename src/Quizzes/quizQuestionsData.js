@@ -35,25 +35,17 @@ export const quizQuestionsData = {
     questions: [
       {
         id: 201,
-        question: "What is the derivative of x² with respect to x?",
-        options: ["x", "2", "2x", "x²"],
-        correctAnswer: "2x",
+        question: "What is the derivative of sin(x) with respect to x?",
+        options: ["cos(x)", "-cos(x)", "sin(x)", "-sin(x)"],
+        correctAnswer: "cos(x)",
         points: 100,
         difficulty: "Medium"
       },
       {
         id: 202,
-        question: "If a right-angled triangle has sides of length 3 and 4, what is the length of its hypotenuse?",
-        options: ["5", "6", "7", "12"],
-        correctAnswer: "5",
-        points: 100,
-        difficulty: "Easy"
-      },
-      {
-        id: 203,
-        question: "What is the value of log₁₀(100)?",
-        options: ["1", "2", "10", "100"],
-        correctAnswer: "2",
+        question: "Solve for x in the equation: 2x + 7 = 15",
+        options: ["3", "4", "5", "6"],
+        correctAnswer: "4",
         points: 100,
         difficulty: "Easy"
       }
@@ -65,27 +57,19 @@ export const quizQuestionsData = {
     questions: [
       {
         id: 301,
-        question: "Which element has the chemical symbol 'O' on the Periodic Table?",
-        options: ["Osmium", "Oxygen", "Gold", "Hydrogen"],
-        correctAnswer: "Oxygen",
+        question: "What is the chemical symbol for the element Gold?",
+        options: ["Ag", "Au", "Fe", "Gd"],
+        correctAnswer: "Au",
         points: 100,
         difficulty: "Easy"
       },
       {
         id: 302,
-        question: "What is the pH level of pure water at room temperature?",
-        options: ["5", "7", "9", "14"],
-        correctAnswer: "7",
-        points: 100,
-        difficulty: "Easy"
-      },
-      {
-        id: 303,
-        question: "Which gas is the most abundant in Earth's atmosphere?",
-        options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Argon"],
+        question: "Which gas is most abundant in the Earth's atmosphere?",
+        options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
         correctAnswer: "Nitrogen",
         points: 100,
-        difficulty: "Medium"
+        difficulty: "Easy"
       }
     ]
   }

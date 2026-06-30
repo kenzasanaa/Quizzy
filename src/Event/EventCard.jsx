@@ -1,143 +1,101 @@
 import React from 'react';
-import { BookOpen, Calendar, Clock, Users, MoreVertical, Edit3, Copy, Trash2 } from 'lucide-react';
-import { getEventStatus, formatDisplayDateTime } from './eventHelpers';
+import { Calendar, Clock, Users, BookOpen, MoreVertical } from 'lucide-react';
 
-export default function EventCard({
-  evt,
-  userRole,
-  activeDropdownId,
-  setActiveDropdownId,
-  onEdit,
-  onDuplicate,
-  onDelete
-}) {
-  const status = getEventStatus(evt);
-  const isMenuOpen = activeDropdownId === evt.id;
-
-  const handleDropdownToggle = (e) => {
-    e.stopPropagation();
-    setActiveDropdownId(isMenuOpen ? null : evt.id);
+export default function EventCard({ evt, onManage, onDropdownClick, isDropdownOpen, dropdownRef, onEdit, onDuplicate, onDelete }) {
+  const getStatusBadge = (status) => {
+    const styles = {
+      upcoming: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/25',
+      live: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
+      past: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/25'
+    };
+    return (
+      <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${styles[status] || styles.upcoming}`}>
+        {status}
+      </span>
+    );
   };
 
   return (
-    <div className="p-4 rounded-2xl border bg-[#1B1026]/60 border-zinc-800/40 hover:border-zinc-800 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative">
-      <div className="flex items-start gap-4 min-w-0">
-        
-        {evt.iconType === 'book' ? (
-          <div className="p-3.5 rounded-xl border shrink-0 bg-[#170E2A] text-[#9396C2] border-[#9396C2]/10">
-            <BookOpen size={18} />
-          </div>
-        ) : (
-          <div className="p-3.5 rounded-xl border shrink-0 bg-[#FFB86B]/15 text-[#FFB86B] border-[#FFB86B]/20">
-            <Calendar size={18} />
-          </div>
-        )}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-[#251836]/80 border border-[#FF7AB6]/5 rounded-xl sm:rounded-2xl hover:border-[#FF7AB6]/20 transition-all group">
+      {/* Icon */}
+      <div className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl bg-[#2D1B3D] border border-[#FF7AB6]/10 shrink-0">
+        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF7AB6]" />
+      </div>
 
-        <div className="space-y-1.5 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h4 className="font-bold text-sm text-white truncate">{evt.title}</h4>
-            
-            <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-              status === 'Active' 
-                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' 
-                : status === 'Upcoming' 
-                ? 'bg-indigo-500/10 text-[#9396C2] border border-[#9396C2]/20' 
-                : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
-            }`}>
-              {status}
-            </span>
-          </div>
-
-          <p className="text-zinc-400 text-xs truncate max-w-sm sm:max-w-md">
-            {evt.description || "Basic concepts of biology for beginners"}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500 font-medium">
-            <span className="flex items-center gap-1">
-              <BookOpen size={12} /> 15 questions
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock size={12} /> {formatDisplayDateTime(evt.date, evt.clockTime)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Users size={12} /> {evt.participants || "32 completions"}
-            </span>
-            <span className="text-[10px] text-zinc-600">Created just now</span>
-          </div>
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          <h3 className="font-bold text-sm text-white truncate">{evt.title}</h3>
+          {getStatusBadge(evt.status)}
+        </div>
+        <p className="text-xs text-zinc-400 truncate mb-2 hidden sm:block">{evt.description}</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500">
+          <span className="flex items-center gap-1">
+            <BookOpen className="w-3 h-3" />
+            {evt.questions} questions
+          </span>
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {evt.date}
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {evt.time}
+          </span>
+          <span className="flex items-center gap-1">
+            <Users className="w-3 h-3" />
+            {evt.participants} participants
+          </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0 self-end sm:self-center relative">
-        {status === 'Active' ? (
-          <button 
-            className="px-4 py-2 bg-[#9396C2] hover:bg-[#8C88BA] text-[#170E2A] rounded-xl text-xs font-bold transition-all outline-none cursor-pointer"
+      {/* Actions */}
+      <div className="flex items-center gap-2 shrink-0 mt-2 sm:mt-0">
+        <button
+          onClick={() => onManage(evt)}
+          className="px-3 sm:px-4 py-2 text-xs font-semibold rounded-xl border border-[#FF7AB6]/30 text-[#FF7AB6] hover:bg-[#FF7AB6] hover:text-[#1B1026] hover:border-[#FF7AB6] transition-all"
+        >
+          Manage
+        </button>
+
+        <div className="relative" ref={isDropdownOpen ? dropdownRef : null}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDropdownClick(evt.id);
+            }}
+            className="p-2 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-all"
           >
-            View Live
+            <MoreVertical className="w-4 h-4" />
           </button>
-        ) : (
-          userRole === 'teacher' && (
-            <button 
-              className="px-4 py-2 border border-[#FF7AB6]/40 hover:border-[#FF7AB6] text-[#FF7AB6] rounded-xl text-xs font-bold transition-all outline-none cursor-pointer"
-            >
-              Manage
-            </button>
-          )
-        )}
 
-        {userRole === 'teacher' && (
-          <button 
-            onClick={handleDropdownToggle}
-            className="p-2 hover:bg-zinc-800/40 text-zinc-500 hover:text-white rounded-xl transition-colors outline-none cursor-pointer"
-          >
-            <MoreVertical size={16} />
-          </button>
-        )}
-
-        {userRole === 'teacher' && isMenuOpen && (
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 top-11 bg-[#110726] border border-zinc-800 rounded-2xl p-2 w-44 shadow-2xl z-40 animate-in fade-in slide-in-from-top-1 duration-150"
-          >
-            <span className="text-[9px] font-black text-zinc-500 tracking-wider uppercase block px-3 py-1 mb-1">
-              Action Menu
-            </span>
-
-            <button 
-              onClick={() => {
-                onEdit(evt);
-                setActiveDropdownId(null);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 rounded-xl transition-all cursor-pointer"
-            >
-              <Edit3 size={14} className="text-zinc-400" />
-              Edit
-            </button>
-
-            <button 
-              onClick={() => {
-                onDuplicate(evt);
-                setActiveDropdownId(null);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 rounded-xl transition-all cursor-pointer"
-            >
-              <Copy size={14} className="text-zinc-400" />
-              Duplicate
-            </button>
-
-            <div className="border-t border-zinc-800/50 my-1" />
-
-            <button 
-              onClick={() => {
-                onDelete(evt);
-                setActiveDropdownId(null);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-rose-400 hover:text-rose-300 hover:bg-rose-500/5 rounded-xl transition-all cursor-pointer"
-            >
-              <Trash2 size={14} className="text-rose-400" />
-              Delete
-            </button>
-          </div>
-        )}
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-full mt-2 w-44 bg-[#2D1B3D] border border-[#FF7AB6]/10 rounded-xl shadow-2xl shadow-black/40 py-1.5 z-20 overflow-hidden">
+              <div className="px-3 py-2 border-b border-zinc-700/50 mb-1">
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Action Menu</p>
+              </div>
+              <button
+                onClick={() => onEdit(evt)}
+                className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
+              >
+                <Calendar className="w-3.5 h-3.5" /> Edit
+              </button>
+              <button
+                onClick={() => onDuplicate(evt)}
+                className="w-full px-4 py-2 text-left text-xs text-zinc-300 hover:bg-[#FF7AB6]/10 hover:text-white flex items-center gap-2.5 transition-colors"
+              >
+                <Users className="w-3.5 h-3.5" /> Duplicate
+              </button>
+              <div className="my-1 border-t border-zinc-700/50" />
+              <button
+                onClick={() => onDelete(evt.id)}
+                className="w-full px-4 py-2 text-left text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5 transition-colors"
+              >
+                <span className="w-3.5 h-3.5 flex items-center justify-center">✕</span> Delete
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

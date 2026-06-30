@@ -5,12 +5,13 @@ import SignInPage from './form/SignInPage.jsx';
 import RegisterPage from './form/RegisterPage.jsx';
 import DashboardPage from './DashBord/DashboardPage.jsx';
 import CreateQuizPage from './DashBord/CreateQuizPage.jsx';
-import EventsPage from './Event/EventsPage'; 
-import ProtectedRoute from './quizzyBackend/ProtectedRoute';
+import EventsPage from './Event/EventsPage.jsx';
 import Students from './students/StudentsPage.jsx';
 import Quizzes from './Quizzes/QuizzesPage.jsx';
-import QuizDetailsPage from './Quizzes/details/QuizDetailsPage';
-import QuizActivePage from './Quizzes/QuizActivePage'; 
+import QuizDetailsPage from './Quizzes/details/QuizDetailsPage.jsx';
+import QuizActivePage from './Quizzes/QuizActivePage.jsx';
+import SettingsPage from './parrameter/SettingsPage.jsx';
+import ProtectedRoute from './quizzyBackend/ProtectedRoute.jsx';
 
 function App() {
   return (
@@ -21,69 +22,76 @@ function App() {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* --- Protected Routes --- */}
-        <Route 
-          path="/dashboard" 
+        {/* --- Protected Routes (any logged-in user) --- */}
+        <Route
+          path="/quizzes"
           element={
-            <ProtectedRoute >
-              <DashboardPage />
-            </ProtectedRoute>
-          } 
-        /> 
-        <Route 
-          path="/quizzes" 
-          element={
-            <ProtectedRoute >
+            <ProtectedRoute>
               <Quizzes />
             </ProtectedRoute>
-          } 
-        /> 
-
-        {/* --- Clicking Quiz Title routes here (Details/Analytics) --- */}
-        <Route 
-          path="/quizzes/:id"
+          }
+        />
+        <Route
+          path="/quizzes/:quizId"
           element={
-            <ProtectedRoute >
-              <QuizDetailsPage  />
+            <ProtectedRoute>
+              <QuizDetailsPage />
             </ProtectedRoute>
-          } 
-        /> 
-
-        {/* --- Clicking 'View' routes here (Quiz Gameplay Page) --- */}
-        <Route 
-          path="/quizzes/:id/play"
+          }
+        />
+        <Route
+          path="/quizzes/:quizId/play"
           element={
-            <ProtectedRoute >
-              <QuizActivePage  />
+            <ProtectedRoute>
+              <QuizActivePage />
             </ProtectedRoute>
-          } 
-        /> 
-        
-        <Route 
-          path="/events" 
+          }
+        />
+        <Route
+          path="/events"
           element={
-            <ProtectedRoute >
+            <ProtectedRoute>
               <EventsPage />
             </ProtectedRoute>
-          } 
-        /> 
-        <Route 
-          path="/Students" 
+          }
+        />
+        <Route
+          path="/settings"
           element={
-            <ProtectedRoute >
-              <Students />
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
-          } 
-        /> 
-        
-        <Route 
-          path="/create-quiz" 
+          }
+        />
+
+        {/* --- Teacher-Only Routes --- */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRole="teacher">
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-quiz"
           element={
             <ProtectedRoute allowedRole="teacher">
               <CreateQuizPage />
             </ProtectedRoute>
-          } 
-        />       
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute allowedRole="teacher">
+              <Students />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* --- Catch-all: redirect to home --- */}
+        <Route path="*" element={<QuizzyLandingPage />} />
       </Routes>
     </Router>
   );

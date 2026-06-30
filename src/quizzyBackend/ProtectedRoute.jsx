@@ -1,4 +1,3 @@
-// ProtectedRoute.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -13,10 +12,9 @@ export default function ProtectedRoute({ children, allowedRole }) {
   }
 
   // 3. If a specific role is required, check if the user matches it.
-  // For example, if a Student tries to view a Teacher page, redirect them.
   if (allowedRole && role !== allowedRole) {
-    alert('Access Denied: You do not have permission to view this page.');
-    return <Navigate to="/" replace />; // Send them back to home or safe page
+    // Redirect to a safe page instead of using alert()
+    return <Navigate to="/" replace />;
   }
 
   // 4. If they pass all checks, render the page
