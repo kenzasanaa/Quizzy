@@ -11,7 +11,7 @@ const app = express();
 // ============================================================
 // 1. RESTRICT CORS (only your frontend can call the API)
 // ============================================================
-const FRONTEND_URL= {
+const corsOptions = {
   origin: process.env.FRONTEND_URL || 'https://quizzy-beta-kohl.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
